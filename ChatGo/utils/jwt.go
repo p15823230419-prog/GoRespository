@@ -9,13 +9,13 @@ import (
 var JwtKey = []byte("7K7l3q9v8F2mNx5PbRtYs1HcDgJeLfKwUoQzEaBnWpXyGvRiSjTlOmNcCuZdXhA1kB6f9s2v4r8n5j3p0q7t1u")
 
 type Claims struct {
-	UserID   uint
+	UserID   uint64
 	Username string
 	jwt.RegisteredClaims
 }
 
 // 生成token
-func GenerateToken(userID uint, username string) (string, error) {
+func GenerateToken(userID uint64, username string) (string, error) {
 	claims := &Claims{
 		UserID:   userID,
 		Username: username,

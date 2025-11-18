@@ -14,7 +14,7 @@ func main() {
 	//初始化gin
 	r := gin.Default()
 	//注册用户
-	r.POST("/user/register", controllers.RegisterUser)
+	r.POST("/register", controllers.RegisterUser)
 	//登录用户
 	r.POST("/login", controllers.LoginUser)
 	//中间件

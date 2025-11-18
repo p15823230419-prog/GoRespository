@@ -1,10 +1,12 @@
 package models
 
+import "time"
+
 type Message struct {
-	Id         string `gorm:"type:bigint(20);primary_key" json:"id"`
-	SenderId   string `gorm:"type:bigint(20)" json:"sender"`
-	ReceiverId string `gorm:"type:bigint(20)" json:"receiver"`
-	Content    string `gorm:"type:varchar(511)" json:"content"`
-	CreateAt   string `gorm:"" json:"create_at"`
-	UpdateAt   string `gorm:"" json:"update_at"`
+	Id         uint64    `gorm:"type:bigint(20);primary_key" json:"id"`
+	SenderId   uint64    `gorm:"type:bigint(20);column:senderId" json:"senderId"`
+	ReceiverId uint64    `gorm:"type:bigint(20);column:receiverId" json:"receiverId"`
+	Content    string    `gorm:"type:varchar(511)" json:"content"`
+	CreatedAt  time.Time `gorm:"type:datetime;comment:创建时间;column:createdAt" json:"createdAt"`
+	UpdatedAt  time.Time `gorm:"type:datetime;comment:更新时间;column:updatedAt" json:"updatedAt"`
 }

@@ -10,13 +10,6 @@ import (
 
 var db *gorm.DB
 
-type Messages struct {
-	Sender   string `grom:"column:sender"`
-	Receiver string `grom:"column:receiver"`
-	Content  string `grom:"column:content"`
-	gorm.Model
-}
-
 func InitDB() {
 	dsn := "root:root@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
 	gormDb, err := gorm.Open(mysql.Open(dsn), &gorm.Config{

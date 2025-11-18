@@ -133,7 +133,7 @@ func LoginUser(c *gin.Context) {
 	}
 
 	//生成token
-	token, _ := utils.GenerateToken(uint(user.Id), user.Username)
+	token, _ := utils.GenerateToken(user.Id, user.Username)
 	// 4. 成功
 	c.JSON(200, gin.H{
 		"code": 0,
@@ -150,7 +150,9 @@ func SelectUser(c *gin.Context) {
 	username := c.Query("username")
 	if id != "" {
 		var user models.User
-		if err := db.Where("id = ?", id).First(&user).Error; err != nil {
+		if err := db.
+			Select("id", "username", "avatar", "nickname", "createdAt", "updatedAt").
+			Where("id = ?", id).First(&user).Error; err != nil {
 			c.JSON(401, gin.H{
 				"code": 1,
 				"msg":  err.Error(),
@@ -164,7 +166,9 @@ func SelectUser(c *gin.Context) {
 		return
 	} else if username != "" {
 		var req []models.User
-		if err := db.Where("username LIKE ?", "%"+username+"%").Find(&req).Error; err != nil {
+		if err := db.
+			Select("id", "username", "avatar", "nickname", "createdAt", "updatedAt").
+			Where("username LIKE ?", "%"+username+"%").Find(&req).Error; err != nil {
 			c.JSON(500, gin.H{
 				"code": 1,
 				"msg":  err.Error(),

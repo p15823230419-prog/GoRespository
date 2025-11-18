@@ -10,14 +10,26 @@ import (
 
 // SendHandler 发送消息请求函数
 func SendHandler(c *gin.Context) {
-	var mes Messages
+	var mes models.Message
 
 	if err := c.ShouldBind(&mes); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": 400,
+			"msg":  "参数错误",
+		})
 		return
 	}
+	//从token中提取id
+	userId, exists := c.Get("userId")
+	if !exists {
+		c.JSON(401, gin.H{
+			"code": 1,
+			"msg":  "未找到userId",
+		})
+	}
+	mes.SenderId = userId.(uint64)
+	//添加到数据库
 	result := db.Create(&mes)
-
 	if result.Error != nil {
 		c.JSON(500, gin.H{
 			"code": 1,
@@ -44,7 +56,7 @@ func MessagesHandler(c *gin.Context) {
 
 	//gorm查询消息表
 	err := db.
-		Model(&Messages{}).
+		Model(models.Message{}).
 		Select("id", "senderId", "content", "created_at").
 		Where("receiver = ? AND id > ?", user, afterID).
 		Order("id ASC").
