@@ -29,7 +29,7 @@ func main() {
 		//发送消息
 		userGroup.POST("/send", controllers.SendHandler)
 		//查看消息
-		userGroup.GET("/messages", controllers.MessagesHandler)
+		userGroup.GET("/messages", controllers.GetMessages)
 	}
 	//开始监听端口
 	err := r.Run(":8080")

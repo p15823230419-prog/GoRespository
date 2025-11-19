@@ -46,37 +46,73 @@ func SendHandler(c *gin.Context) {
 	})
 }
 
-// MessagesHandler 读取所有消息API
-func MessagesHandler(c *gin.Context) {
+// GetMessages 读取所有消息API
+func GetMessages(c *gin.Context) {
 
 	var msgs []models.Message
 
-	user := c.Query("user")
-	afterID := c.Query("after_id")
-
-	//gorm查询消息表
-	err := db.
-		Model(models.Message{}).
-		Select("id", "senderId", "content", "created_at").
-		Where("receiver = ? AND id > ?", user, afterID).
-		Order("id ASC").
-		Find(&msgs).
-		Error
-	if err != nil {
-		log.Println("未获取到消息")
-		c.JSON(http.StatusInternalServerError, gin.H{
+	userId, exists := c.Get("userId")
+	if !exists {
+		c.JSON(401, gin.H{
 			"code": 1,
-			"msg":  "未获取到消息",
-			"data": nil,
+			"msg":  "未找到userId",
 		})
 		return
 	}
+	var req = models.MsgListReq{}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": 400,
+			"msg":  "参数错误" + err.Error(),
+		})
+		return
+	}
+	//获取自己ID
+	//获取聊天对象ID
+	//gorm查询消息表
+	if req.AfterId == 0 {
+		err := db.
+			Model(models.Message{}).
+			Select("id", "senderId", "receiverId", "content", "createdAt").
+			Where("((receiverId = ? AND senderId = ?) or (receiverId = ? AND senderId = ?)) AND id > ?", userId, req.TargetId, req.TargetId, userId, req.AfterId).
+			Order("id DESC").
+			Limit(req.Limit).
+			Find(&msgs).
+			Error
+		if err != nil {
+			log.Println("未获取到消息")
+			c.JSON(200, gin.H{
+				"code": 0,
+				"msg":  "未获取到消息",
+			})
+			return
+		}
+	} else {
+		err := db.
+			Model(models.Message{}).
+			Select("id", "senderId", "receiverId", "content", "createdAt").
+			Where("((receiverId = ? AND senderId = ?) or (receiverId = ? AND senderId = ?)) AND id < ?", userId, req.TargetId, req.TargetId, userId, req.AfterId).
+			Order("id DESC").
+			Limit(req.Limit).
+			Find(&msgs).
+			Error
+		if err != nil {
+			log.Println("未获取到消息")
+			c.JSON(200, gin.H{
+				"code": 0,
+				"msg":  "未获取到消息",
+			})
+			return
+		}
+	}
+
 	log.Printf("成功获取 %d 条消息。\n", len(msgs))
 	c.JSON(200, gin.H{
 		"code": 0,
 		"msg":  "success",
 		"data": gin.H{
-			"messages": msgs,
+			"next_after_id": msgs[len(msgs)-1].Id,
+			"messages":      msgs,
 		},
 	})
 }

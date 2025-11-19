@@ -25,12 +25,14 @@ func RegisterUser(c *gin.Context) {
 		})
 		return
 	}
+	//密码加密
 	hashedPassword, err := utils.HashPassword(req.Password)
 	if err != nil {
 		c.JSON(500, gin.H{"msg": "密码加密失败"})
 		return
 	}
 	req.Password = hashedPassword
+	//注册用户
 	if err := db.Create(&req).Error; err != nil {
 		c.JSON(401, gin.H{
 			"code": 1,
@@ -75,6 +77,7 @@ func DeleteUser(c *gin.Context) {
 // UpdateUser 更改用户数据put
 func UpdateUser(c *gin.Context) {
 	var req models.User
+	//获取参数
 	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(400, gin.H{
 			"code": 1,
@@ -83,6 +86,27 @@ func UpdateUser(c *gin.Context) {
 		})
 		return
 	}
+	if req.Password != "" {
+		//密码加密
+		hashedPassword, err := utils.HashPassword(req.Password)
+		if err != nil {
+			c.JSON(500, gin.H{"msg": "密码加密失败"})
+			return
+		}
+		req.Password = hashedPassword
+	}
+	//获取当前用户id
+	userId, exists := c.Get("userId")
+	if !exists {
+		c.JSON(401, gin.H{
+			"code": 1,
+			"msg":  "未找到userId",
+		})
+		return
+	}
+	userIdInt, _ := userId.(uint64)
+	req.Id = userIdInt
+	//更新数据库
 	if err := db.Model(&req).Updates(req).Error; err != nil {
 		c.JSON(400, gin.H{
 			"code": 1,
@@ -157,6 +181,7 @@ func SelectUser(c *gin.Context) {
 				"code": 1,
 				"msg":  err.Error(),
 			})
+			return
 		}
 		c.JSON(200, gin.H{
 			"code": 0,
