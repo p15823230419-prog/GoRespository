@@ -3,8 +3,10 @@ package controllers
 import (
 	"ChatGo/models"
 	"ChatGo/utils"
+	"errors"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 // RegisterUser 注册请求post
@@ -28,11 +30,18 @@ func RegisterUser(c *gin.Context) {
 	}
 	req.Password = hashedPassword
 	//注册用户
+	if err := db.Where("username = ?", req.Username).First(&req).Error; err == nil {
+		c.JSON(401, gin.H{
+			"code": 1,
+			"msg":  "用户已存在",
+		})
+		return
+	}
 
 	if err := db.Create(&req).Error; err != nil {
 		c.JSON(401, gin.H{
 			"code": 1,
-			"msg":  "用户已存在",
+			"msg":  "新增用户出错",
 		})
 		return
 	}
@@ -49,17 +58,19 @@ func RegisterUser(c *gin.Context) {
 // DeleteUser 删除用户DELETE
 func DeleteUser(c *gin.Context) {
 	var req models.User
-	if err := c.ShouldBind(&req); err != nil {
-		c.JSON(400, gin.H{
+	id := c.Param("id")
+	if err := db.First(&req, id).Error; err != nil {
+		c.JSON(401, gin.H{
 			"code": 1,
-			"msg":  "参数错误" + err.Error(),
+			"msg":  "未找到该用户",
 		})
 		return
 	}
+
 	if err := db.Delete(&req).Error; err != nil {
 		c.JSON(401, gin.H{
 			"code": 1,
-			"msg":  "删除失败" + err.Error(),
+			"msg":  "删除失败",
 		})
 		return
 	}
@@ -77,8 +88,7 @@ func UpdateUser(c *gin.Context) {
 	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(400, gin.H{
 			"code": 1,
-			"msg":  "参数错误",
-			"data": err.Error(),
+			"msg":  utils.PareJSONError(err),
 		})
 		return
 	}
@@ -133,12 +143,14 @@ func LoginUser(c *gin.Context) {
 	// 2. 查询用户
 	var user models.User
 	if err := db.Where("username = ?", req.Username).First(&user).Error; err != nil {
-		c.JSON(401, gin.H{
-			"code": 1,
-			"msg":  "未找到该用户",
-			"data": nil,
-		})
-		return
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(401, gin.H{
+				"code": 1,
+				"msg":  "未找到该用户",
+				"data": nil,
+			})
+			return
+		}
 	}
 	//3. 验证密码
 	if !utils.CheckPasswordHash(req.Password, user.Password) {
@@ -183,19 +195,19 @@ func SelectUser(c *gin.Context) {
 		})
 		return
 	} else if username != "" {
-		var req []models.User
+		var res []models.User
 		if err := db.
 			Select("id", "username", "avatar", "nickname", "createdAt", "updatedAt").
-			Where("username LIKE ?", "%"+username+"%").Find(&req).Error; err != nil {
+			Where("username LIKE ?", "%"+username+"%").Find(&res).Error; err != nil {
 			c.JSON(500, gin.H{
 				"code": 1,
-				"msg":  err.Error(),
+				"msg":  "查找用户失败",
 			})
 		}
 		c.JSON(200, gin.H{
 			"code": 0,
 			"msg":  "success",
-			"data": req,
+			"data": res,
 		})
 		return
 	} else {
