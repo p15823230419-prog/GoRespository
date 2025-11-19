@@ -12,7 +12,10 @@ func JWTAuth() gin.HandlerFunc {
 		// 从 header 获取 token
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
-			c.JSON(401, gin.H{"msg": "未登录"})
+			c.JSON(401, gin.H{
+				"code": 401,
+				"msg":  "未登录",
+			})
 			c.Abort()
 			return
 		}

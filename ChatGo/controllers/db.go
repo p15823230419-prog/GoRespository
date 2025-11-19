@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"ChatGo/models"
 	"log"
 
 	"gorm.io/driver/mysql"
@@ -19,6 +20,12 @@ func InitDB() {
 	})
 	if err != nil {
 		log.Fatalf("无法连接到数据库: %v", err)
+	}
+	if err = gormDb.AutoMigrate(&models.User{}); err != nil {
+		log.Fatal(err)
+	}
+	if err = gormDb.AutoMigrate(&models.Message{}); err != nil {
+		log.Fatal(err)
 	}
 	log.Printf("连接成功")
 	db = gormDb

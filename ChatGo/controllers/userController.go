@@ -5,7 +5,6 @@ import (
 	"ChatGo/utils"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 )
 
 // RegisterUser 注册请求post
@@ -14,29 +13,26 @@ func RegisterUser(c *gin.Context) {
 	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(500, gin.H{
 			"code": 20001,
-			"msg":  "参数错误" + err.Error(),
-		})
-		return
-	}
-	if err := validator.New().Struct(req); err != nil {
-		c.JSON(500, gin.H{
-			"code": 20001,
-			"msg":  "格式错误" + err.Error(),
+			"msg":  utils.PareJSONError(err),
 		})
 		return
 	}
 	//密码加密
 	hashedPassword, err := utils.HashPassword(req.Password)
 	if err != nil {
-		c.JSON(500, gin.H{"msg": "密码加密失败"})
+		c.JSON(500, gin.H{
+			"code": 20002,
+			"msg":  "密码加密失败",
+		})
 		return
 	}
 	req.Password = hashedPassword
 	//注册用户
+
 	if err := db.Create(&req).Error; err != nil {
 		c.JSON(401, gin.H{
 			"code": 1,
-			"msg":  "用户名已注册" + err.Error(),
+			"msg":  "用户已存在",
 		})
 		return
 	}
@@ -125,28 +121,25 @@ func UpdateUser(c *gin.Context) {
 // LoginUser 登录请求函数post
 func LoginUser(c *gin.Context) {
 	var req models.User
-
 	// 1. 获取 JSON
 	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(400, gin.H{
 			"code": 1,
-			"msg":  err.Error(),
+			"msg":  utils.PareJSONError(err),
 			"data": "参数错误",
 		})
 		return
 	}
-
 	// 2. 查询用户
 	var user models.User
 	if err := db.Where("username = ?", req.Username).First(&user).Error; err != nil {
 		c.JSON(401, gin.H{
 			"code": 1,
-			"msg":  err.Error(),
+			"msg":  "未找到该用户",
 			"data": nil,
 		})
 		return
 	}
-
 	//3. 验证密码
 	if !utils.CheckPasswordHash(req.Password, user.Password) {
 		c.JSON(401, gin.H{
@@ -179,7 +172,7 @@ func SelectUser(c *gin.Context) {
 			Where("id = ?", id).First(&user).Error; err != nil {
 			c.JSON(401, gin.H{
 				"code": 1,
-				"msg":  err.Error(),
+				"msg":  "查询用户失败",
 			})
 			return
 		}

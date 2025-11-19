@@ -3,12 +3,13 @@ package main
 import (
 	"ChatGo/middleware"
 
-	"github.com/gin-gonic/gin"
-
 	"ChatGo/controllers"
+	"ChatGo/utils"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	utils.InitValidator()
 	//初始化数据库
 	controllers.InitDB()
 	//初始化gin
