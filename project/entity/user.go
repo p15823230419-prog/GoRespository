@@ -6,10 +6,12 @@ type User struct {
 	Id        uint64
 	Username  string
 	Nickname  string
-	Avatar    string
 	Password  string
-	Mobile    string
+	Phone     string
 	Email     string
 	Status    int8
+	Avatar    string
+	Role      string
 	CreatedAt time.Time
+	UpdatedAt time.Time
 }

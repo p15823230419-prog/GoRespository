@@ -2,20 +2,36 @@ package main
 
 import (
 	"abc/controller"
+	"abc/middleware"
+	"abc/utils"
+	"log"
 
 	"github.com/gin-gonic/gin"
 )
 
 var userController *controller.UserController
 
-func main() {
+func WebInit() {
+	//初始化
 	r := gin.Default()
+
+	userGroup := r.Group("/user", middleware.JWTAuth())
+	r.POST("/user/login", userController.Login)
+	r.POST("/user/register", userController.Register)
+
 	userController = controller.NewUserController()
-	// gin 框架 官方中间件
-	r.GET("/user/login", userController.Login)
-	//监听端口默认为8080
-	err := r.Run(":8000")
+
+	userGroup.GET("/list", userController.List)
+
+	//监听8080端口
+	err := r.Run(":8080")
 	if err != nil {
+		log.Fatal(err)
 		return
 	}
+}
+
+func main() {
+	utils.InitDB()
+	WebInit()
 }

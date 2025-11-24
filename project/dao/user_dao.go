@@ -6,45 +6,76 @@ import (
 	"abc/utils"
 	"context"
 	"errors"
+
 	"gorm.io/gorm"
 )
 
 type UserDao struct {
 }
 
-func (u *UserDao) Add(ctx context.Context, user entity.User) error {
-	return utils.DB.WithContext(ctx).Create(userEntityToModel(user)).Error
-}
-func (u *UserDao) FindByUsername(ctx context.Context, username string) (*entity.User, error) {
-	var m model.User
-	err := utils.DB.WithContext(ctx).Where("username = ?", username).First(&m).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, nil
-	}
+// 注册用户
+func (u *UserDao) Create(ctx context.Context, user entity.User) (*uint64, error) {
+	var modelUser = userEntityToModel(user)
+	err := utils.DB.WithContext(ctx).Create(&modelUser).Error
 	if err != nil {
 		return nil, err
 	}
+	return &modelUser.Id, nil
+}
+
+// 通过名字查询
+func (u *UserDao) FindByUsername(ctx context.Context, username string) (*entity.User, error) {
+	var m model.User
+	err := utils.DB.WithContext(ctx).Where("username = ?", username).First(&m).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	} else if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
 	return userModelToEntity(m), nil
 }
+
+// 获取所有用户
+func (u *UserDao) FindUsers(ctx context.Context) ([]*entity.User, error) {
+	var users []model.User
+	if err := utils.DB.WithContext(ctx).
+		Model(model.User{}).
+		Select("id", "username", "avatar", "email", "phone", "role", "nickname", "createdAt", "updatedAt").
+		Find(&users).
+		Error; err != nil {
+		return nil, err
+	}
+	return userModelsToEntities(users), nil
+}
+
 func userModelToEntity(m model.User) *entity.User {
 	return &entity.User{
 		Id:        m.Id,
 		Username:  m.Username,
 		Nickname:  m.Nickname,
 		Password:  m.Password,
-		Mobile:    m.Mobile,
+		Phone:     m.Phone,
 		Email:     m.Email,
 		Status:    m.Status,
 		CreatedAt: m.CreatedAt,
 	}
 }
-func userEntityToModel(e entity.User) *model.User {
-	return &model.User{
+
+func userModelsToEntities(models []model.User) []*entity.User {
+	res := make([]*entity.User, len(models))
+	for i, m := range models {
+		res[i] = userModelToEntity(m)
+	}
+	return res
+}
+
+func userEntityToModel(e entity.User) *entity.User {
+	return &entity.User{
 		Id:        e.Id,
 		Username:  e.Username,
 		Nickname:  e.Nickname,
 		Password:  e.Password,
-		Mobile:    e.Mobile,
+		Phone:     e.Phone,
 		Email:     e.Email,
 		Status:    e.Status,
 		CreatedAt: e.CreatedAt,
