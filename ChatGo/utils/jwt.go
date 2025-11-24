@@ -3,26 +3,27 @@ package utils
 import (
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 var JwtKey = []byte("7K7l3q9v8F2mNx5PbRtYs1HcDgJeLfKwUoQzEaBnWpXyGvRiSjTlOmNcCuZdXhA1kB6f9s2v4r8n5j3p0q7t1u")
 
 type Claims struct {
 	UserID   uint64
-	Username string
+	Password string
 	jwt.RegisteredClaims
 }
 
 // 生成token
-func GenerateToken(userID uint64, username string) (string, error) {
+
+func GenerateToken(userID uint64, password string) (string, error) {
 	claims := &Claims{
 		UserID:   userID,
-		Username: username,
+		Password: password,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)), // token 24h 过期
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(12 * time.Hour)), // token 过期时间
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			Issuer:    "chatgo",
+			Issuer:    "ChatGo",
 		},
 	}
 

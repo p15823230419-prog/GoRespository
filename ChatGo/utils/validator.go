@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/gin-gonic/gin/binding"
 	zh "github.com/go-playground/locales/zh"
@@ -31,7 +32,7 @@ func InitValidator() {
 }
 
 // 翻译错误
-func PareJSONError(e error) []string {
+func PareJSONError(e error) string {
 	var translated []string
 	var errs validator.ValidationErrors
 	if errors.As(e, &errs) {
@@ -40,5 +41,5 @@ func PareJSONError(e error) []string {
 			translated = append(translated, e.Translate(Trans))
 		}
 	}
-	return translated
+	return strings.Join(translated, ",")
 }

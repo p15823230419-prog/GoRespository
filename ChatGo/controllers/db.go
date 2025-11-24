@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-var db *gorm.DB
+var DB *gorm.DB
 
 func InitDB() {
 	dsn := "root:root@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
@@ -28,5 +28,5 @@ func InitDB() {
 		log.Fatal(err)
 	}
 	log.Printf("连接成功")
-	db = gormDb
+	DB = gormDb
 }
