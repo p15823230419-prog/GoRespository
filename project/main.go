@@ -13,13 +13,11 @@ var userController *controller.UserController
 
 func WebInit() {
 	//初始化
+	userController = controller.NewUserController()
 	r := gin.Default()
-
 	userGroup := r.Group("/user", middleware.JWTAuth())
 	r.POST("/user/login", userController.Login)
 	r.POST("/user/register", userController.Register)
-
-	userController = controller.NewUserController()
 
 	userGroup.GET("/list", userController.List)
 

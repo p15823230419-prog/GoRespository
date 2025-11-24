@@ -7,7 +7,6 @@ type RegisterRequest struct {
 	Avatar   string `json:"avatar"`
 	Phone    string `json:"phone"`
 	Email    string `json:"email"`
-	Identity string `json:"identity"`
 	Password string `json:"password" binding:"required,min=6,max=20"`
 }
 
@@ -24,4 +23,14 @@ type LoginRequest struct {
 // 登录回应
 type LoginResponse struct {
 	Token string `json:"token"`
+}
+
+type SelectResponse struct {
+	UserId   uint64 `json:"userId"`
+	Username string `json:"username"`
+	Nickname string `json:"nickname"`
+	Avatar   string `json:"avatar"`
+	Phone    string `json:"phone"`
+	Email    string `json:"email"`
+	Role     string `json:"role"`
 }

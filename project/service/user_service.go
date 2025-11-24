@@ -7,6 +7,9 @@ import (
 	"abc/utils"
 	"context"
 	"errors"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type UserService struct {
@@ -29,7 +32,7 @@ func (u *UserService) Register(ctx context.Context, req *dto.RegisterRequest) (*
 	}
 	req.Password = hashedPassword
 	// 创建账户
-	uid, err := u.userDao.Create(ctx, RegisterRequestToEntity(req))
+	uid, err := u.userDao.Create(ctx, *RegisterRequestToEntity(req))
 	if err != nil {
 		return nil, err
 	}
@@ -59,23 +62,49 @@ func (u *UserService) Login(ctx context.Context, req dto.LoginRequest) (*dto.Log
 }
 
 // 查询用户表
-func (u *UserService) List(ctx context.Context) ([]*entity.User, error) {
-	users, err := u.userDao.FindUsers(ctx)
+func (u *UserService) List(ctx *gin.Context) ([]*dto.SelectResponse, error) {
+	username := ctx.Query("username")
+	pageNumStr := ctx.Query("pageNum")
+	pageSizeStr := ctx.Query("pageSize")
+	pageSize, _ := strconv.Atoi(pageSizeStr)
+	pageNum, _ := strconv.Atoi(pageNumStr)
+	users, err := u.userDao.FindUsers(ctx, username, pageNum, pageSize)
 	if err != nil {
 		return nil, err
 	}
-	return users, nil
+	return EntityToSelectResponses(users), nil
 }
 
 // 注册请求体转为gorm实体
-func RegisterRequestToEntity(response *dto.RegisterRequest) entity.User {
-	return entity.User{
-		Username: response.Username,
-		Nickname: response.Nickname,
-		Password: response.Password,
-		Avatar:   response.Avatar,
-		Phone:    response.Phone,
+func RegisterRequestToEntity(request *dto.RegisterRequest) *entity.User {
+	return &entity.User{
+		Username: request.Username,
+		Nickname: request.Nickname,
+		Password: request.Password,
+		Avatar:   request.Avatar,
+		Phone:    request.Phone,
 	}
+}
+
+// 实体转换为返回体
+func EntityToSelectResponse(user entity.User) *dto.SelectResponse {
+	return &dto.SelectResponse{
+		UserId:   user.Id,
+		Username: user.Username,
+		Nickname: user.Nickname,
+		Avatar:   user.Avatar,
+		Phone:    user.Phone,
+		Email:    user.Email,
+		Role:     user.Role,
+	}
+}
+
+func EntityToSelectResponses(users []*entity.User) []*dto.SelectResponse {
+	res := make([]*dto.SelectResponse, len(users))
+	for i, user := range users {
+		res[i] = EntityToSelectResponse(*user)
+	}
+	return res
 }
 
 func NewUserService() *UserService {

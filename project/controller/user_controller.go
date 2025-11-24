@@ -24,7 +24,7 @@ func (u *UserController) Register(c *gin.Context) {
 		utils.ReturnError(c, err)
 		return
 	}
-	utils.ReturnSuccess(c, "注册成功", data)
+	utils.ReturnSuccess(c, "注册成功", *data)
 }
 
 // 用户登录接口
@@ -50,8 +50,10 @@ func (u *UserController) List(c *gin.Context) {
 		return
 	}
 	utils.ReturnSuccess(c, "获取成功", gin.H{
-		"list":  data,
-		"total": len(data),
+		"list":     data,
+		"total":    len(data),
+		"pageNum":  c.Query("pageNum"),
+		"pageSize": c.Query("pageSize"),
 	})
 }
 func NewUserController() *UserController {
