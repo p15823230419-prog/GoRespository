@@ -1,7 +1,6 @@
 package dao
 
 import (
-	"abc/utils"
 	"context"
 
 	"gorm.io/gorm"
@@ -15,7 +14,7 @@ func (t *TxCreateOrderDao) CreateOrder(ctx context.Context) error {
 	//utils.DB.Begin()
 	//utils.DB.Commit()
 	//utils.DB.Rollback()
-	err := utils.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+	err := db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		return nil
 	})
 	return err

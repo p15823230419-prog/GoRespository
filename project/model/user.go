@@ -11,7 +11,7 @@ type User struct {
 	Email     string    `gorm:"type:varchar(100);default:'';NOT NULL;comment:邮箱" json:"email"`
 	Status    int8      `gorm:"type:tinyint(4);default:1;NOT NULL;comment:状态 1.启用 2.禁用" json:"status"`
 	Avatar    string    `gorm:"type:varchar(500);default:'';NOT NULL;comment:头像" json:"avatar"`
-	Role      string    `gorm:"type:tinyint(4);default:0;NOT NULL; comment:角色" json:"role"`
+	Roles     []Role    `gorm:"many2many:user_roles;"`
 	CreatedAt time.Time `gorm:"type:datetime;default:NULL;comment:创建时间" json:"createdAt"`
 	UpdatedAt time.Time `gorm:"type:datetime;default:NULL;comment:更新时间" json:"updatedAt"`
 }

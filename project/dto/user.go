@@ -25,6 +25,15 @@ type LoginResponse struct {
 	Token string `json:"token"`
 }
 
+// 更新请求
+type UpdateRequest struct {
+	Id       uint64 `json:"id"`
+	Username string `json:"username"`
+	Nickname string `json:"nickname"`
+	Avatar   string `json:"avatar"`
+	Phone    string `json:"phone"`
+	Email    string `json:"email"`
+}
 type SelectResponse struct {
 	UserId   uint64 `json:"userId"`
 	Username string `json:"username"`

@@ -39,7 +39,12 @@ func (u *UserController) Login(c *gin.Context) {
 		utils.ReturnError(c, err)
 		return
 	}
-	utils.ReturnSuccess(c, data)
+	utils.ReturnSuccess(c, "登录成功", data)
+}
+
+// 退出登录接口
+func (u *UserController) Logout(c *gin.Context) {
+	utils.ReturnSuccess(c, "退出成功")
 }
 
 // 查询接口
@@ -56,8 +61,28 @@ func (u *UserController) List(c *gin.Context) {
 		"pageSize": c.Query("pageSize"),
 	})
 }
+
+// 删除用户接口
+func (u *UserController) Delete(c *gin.Context) {
+	if err := u.userService.Delete(c); err != nil {
+		utils.ReturnError(c, err)
+	}
+	utils.ReturnSuccess(c, "删除成功")
+}
 func NewUserController() *UserController {
 	return &UserController{
 		userService: service.NewUserService(),
 	}
+}
+
+// 更新用户信息接口
+func (u *UserController) Update(c *gin.Context) {
+	var updateRequest dto.UpdateRequest
+	if err := c.ShouldBind(&updateRequest); err != nil {
+		utils.ReturnError(c, err)
+	}
+	if err := u.userService.Uptate(c, updateRequest); err != nil {
+
+	}
+	utils.ReturnSuccess(c, "更新成功")
 }

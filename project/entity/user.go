@@ -11,7 +11,7 @@ type User struct {
 	Email     string
 	Status    int8
 	Avatar    string
-	Role      string
+	Role      []Role
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

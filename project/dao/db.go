@@ -1,4 +1,4 @@
-package utils
+package dao
 
 import (
 	"abc/model"
@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-var DB *gorm.DB
+var db *gorm.DB
 
 func InitDB() {
 	dsn := "root:root@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
@@ -21,9 +21,11 @@ func InitDB() {
 	if err != nil {
 		log.Fatalf("无法连接到数据库: %v", err)
 	}
-	if err = gormDb.AutoMigrate(&model.User{}); err != nil {
-		log.Fatal(err)
-	}
 	log.Printf("连接成功")
-	DB = gormDb
+	db = gormDb
+	err = db.AutoMigrate(&model.User{}, &model.Role{})
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
 }
