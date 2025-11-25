@@ -1,6 +1,9 @@
 package entity
 
-import "time"
+import (
+	"abc/model"
+	"time"
+)
 
 type User struct {
 	Id        uint64
@@ -11,7 +14,7 @@ type User struct {
 	Email     string
 	Status    int8
 	Avatar    string
-	Role      []Role
+	Roles     []model.Role
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

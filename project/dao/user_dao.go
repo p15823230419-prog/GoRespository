@@ -6,6 +6,8 @@ import (
 	"abc/model"
 	"context"
 	"errors"
+	"fmt"
+	"log"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -21,6 +23,7 @@ func NewUserDao() *UserDao {
 // 注册用户
 func (u *UserDao) Create(ctx context.Context, user entity.User) (*uint64, error) {
 	var modelUser = userEntityToModel(user)
+	log.Println(modelUser)
 	err := db.WithContext(ctx).Create(&modelUser).Error
 	if err != nil {
 		return nil, err
@@ -58,9 +61,8 @@ func (u *UserDao) FindUsers(ctx context.Context, username string, pageNum int, p
 		var modelUsers []model.User
 		if err := db.WithContext(ctx).
 			Model(model.User{}).
-			Select("id", "username", "avatar", "email", "phone", "nickname", "createdAt", "updatedAt").
-			Where("username like ?", "%"+username+"%").
 			Preload("Roles").
+			Where("username like ?", "%"+username+"%").
 			Limit(pageSize).
 			Offset((pageNum - 1) * pageSize).
 			Find(&modelUsers).
@@ -72,7 +74,6 @@ func (u *UserDao) FindUsers(ctx context.Context, username string, pageNum int, p
 		var modelUsers []model.User
 		if err := db.WithContext(ctx).
 			Model(model.User{}).
-			Select("id", "username", "avatar", "email", "phone", "nickname", "createdAt", "updatedAt").
 			Preload("Roles").
 			Limit(pageSize).
 			Offset((pageNum - 1) * pageSize).
@@ -80,6 +81,7 @@ func (u *UserDao) FindUsers(ctx context.Context, username string, pageNum int, p
 			Error; err != nil {
 			return nil, err
 		}
+		fmt.Println(modelUsers)
 		return userModelsToEntities(modelUsers), nil
 	}
 }

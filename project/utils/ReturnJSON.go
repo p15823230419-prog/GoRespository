@@ -12,6 +12,14 @@ func ReturnJSON(c *gin.Context, code int, msg interface{}, data ...interface{}) 
 	})
 }
 
+func ReturnBindError(c *gin.Context, err error, data ...interface{}) {
+	c.JSON(200, gin.H{
+		"code": -1,
+		"msg":  PareJSONError(err),
+		"data": data,
+	})
+}
+
 func ReturnSuccess(c *gin.Context, msg interface{}, data ...interface{}) {
 	var body interface{}
 	if len(data) == 1 {

@@ -2,12 +2,13 @@ package dto //数据和前端的通信接口
 
 // json请求
 type RegisterRequest struct {
-	Username string `json:"username" binding:"required"`
-	Nickname string `json:"nickname"`
-	Avatar   string `json:"avatar"`
-	Phone    string `json:"phone"`
-	Email    string `json:"email"`
-	Password string `json:"password" binding:"required,min=6,max=20"`
+	Username string   `json:"username" binding:"required"`
+	Nickname string   `json:"nickname"`
+	Avatar   string   `json:"avatar"`
+	Phone    string   `json:"phone"`
+	Email    string   `json:"email"`
+	Password string   `json:"password" binding:"required,min=6,max=20"`
+	RoleIDs  []uint64 `json:"role_ids"`
 }
 
 type RegisterResponse struct {
@@ -35,11 +36,11 @@ type UpdateRequest struct {
 	Email    string `json:"email"`
 }
 type SelectResponse struct {
-	UserId   uint64 `json:"userId"`
-	Username string `json:"username"`
-	Nickname string `json:"nickname"`
-	Avatar   string `json:"avatar"`
-	Phone    string `json:"phone"`
-	Email    string `json:"email"`
-	Role     string `json:"role"`
+	UserId   uint64   `json:"userId"`
+	Username string   `json:"username"`
+	Nickname string   `json:"nickname"`
+	Avatar   string   `json:"avatar"`
+	Phone    string   `json:"phone"`
+	Email    string   `json:"email"`
+	Roles    []string `json:"roles"`
 }

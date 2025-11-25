@@ -16,6 +16,7 @@ func userModelToEntity(m model.User) *entity.User {
 		Email:     m.Email,
 		Status:    m.Status,
 		CreatedAt: m.CreatedAt,
+		Roles:     m.Roles,
 	}
 }
 
@@ -28,6 +29,13 @@ func userModelsToEntities(models []model.User) []*entity.User {
 }
 
 func userEntityToModel(e entity.User) *model.User {
+	roles := make([]model.Role, 0, len(e.Roles))
+	for _, r := range e.Roles {
+		roles = append(roles, model.Role{
+			Id:       r.Id,
+			RoleName: r.RoleName,
+		})
+	}
 	return &model.User{
 		Id:        e.Id,
 		Username:  e.Username,
@@ -37,5 +45,6 @@ func userEntityToModel(e entity.User) *model.User {
 		Email:     e.Email,
 		Status:    e.Status,
 		CreatedAt: e.CreatedAt,
+		Roles:     e.Roles,
 	}
 }

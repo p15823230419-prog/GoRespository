@@ -3,6 +3,7 @@ package service
 import (
 	"abc/dao"
 	"abc/dto"
+	"abc/model"
 	"abc/utils"
 	"errors"
 	"log"
@@ -30,6 +31,13 @@ func (u *UserService) Register(c *gin.Context, req *dto.RegisterRequest) (*dto.R
 	} else if user != nil {
 		return nil, errors.New("用户名已存在")
 	}
+	log.Println(req)
+	// 添加角色
+	roles := make([]model.Role, len(req.RoleIDs))
+	for i, id := range req.RoleIDs {
+		roles[i] = model.Role{Id: id}
+	}
+	log.Println(roles, req.RoleIDs)
 	// 加密密码
 	hashedPassword, err := utils.HashPassword(req.Password)
 	if err != nil {
@@ -37,7 +45,7 @@ func (u *UserService) Register(c *gin.Context, req *dto.RegisterRequest) (*dto.R
 	}
 	req.Password = hashedPassword
 	// 创建账户
-	uid, err := u.userDao.Create(ctx, *RegisterRequestToEntity(req))
+	uid, err := u.userDao.Create(ctx, *RegisterRequestToEntity(req, roles))
 	if err != nil {
 		return nil, err
 	}

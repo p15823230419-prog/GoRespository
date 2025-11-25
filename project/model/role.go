@@ -1,6 +1,6 @@
 package model
 
 type Role struct {
-	ID       uint64 `gorm:"primaryKey;autoIncrement"`
-	RoleName string
+	Id       uint64 `gorm:"primaryKey;autoIncrement"`
+	RoleName string `gorm:"type:varchar(100);unique;not null"`
 }
