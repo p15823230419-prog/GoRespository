@@ -36,8 +36,8 @@ func WebInit() {
 	userGroup.PUT("", userController.Update)
 	// 创建角色组
 	roleGroup := r.Group("/role")
-	// 添加角色
 	roleGroup.POST("/add", roleController.Create)
+	roleGroup.GET("list", roleController.List)
 	// 创建菜单组
 	menuGroup := r.Group("/menu")
 	menuGroup.POST("/add", menuController.Create)

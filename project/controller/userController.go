@@ -20,13 +20,13 @@ func NewUserController() *UserController {
 }
 
 // 用户注册接口
-func (uc *UserController) Register(c *gin.Context) {
+func (controller *UserController) Register(c *gin.Context) {
 	var registerRequest dto.RegisterRequest
 	if err := c.ShouldBind(&registerRequest); err != nil {
 		utils.ReturnBindError(c, err)
 		return
 	}
-	data, err := uc.userService.Register(c, &registerRequest)
+	data, err := controller.userService.Register(c, &registerRequest)
 	if err != nil {
 		utils.ReturnError(c, err)
 		return
@@ -35,13 +35,13 @@ func (uc *UserController) Register(c *gin.Context) {
 }
 
 // 用户登录接口
-func (uc *UserController) Login(c *gin.Context) {
+func (controller *UserController) Login(c *gin.Context) {
 	var loginRequest dto.LoginRequest
 	if err := c.ShouldBind(&loginRequest); err != nil {
 		utils.ReturnBindError(c, err)
 		return
 	}
-	data, err := uc.userService.Login(c, loginRequest)
+	data, err := controller.userService.Login(c, loginRequest)
 	if err != nil {
 		utils.ReturnError(c, err)
 		return
@@ -50,17 +50,17 @@ func (uc *UserController) Login(c *gin.Context) {
 }
 
 // 退出登录接口
-func (uc *UserController) Logout(c *gin.Context) {
+func (controller *UserController) Logout(c *gin.Context) {
 	utils.ReturnSuccess(c, "退出成功")
 }
 
 // 查询接口
-func (uc *UserController) List(c *gin.Context) {
+func (controller *UserController) List(c *gin.Context) {
 	var selectRequest dto.SelectRequest
 	if err := c.ShouldBind(&selectRequest); err != nil {
 		utils.ReturnBindError(c, err)
 	}
-	data, err := uc.userService.List(c, selectRequest)
+	data, err := controller.userService.List(c, selectRequest)
 	if err != nil {
 		utils.ReturnError(c, err)
 		return
@@ -74,8 +74,8 @@ func (uc *UserController) List(c *gin.Context) {
 }
 
 // 删除用户接口
-func (uc *UserController) Delete(c *gin.Context) {
-	if err := uc.userService.Delete(c); err != nil {
+func (controller *UserController) Delete(c *gin.Context) {
+	if err := controller.userService.Delete(c); err != nil {
 		utils.ReturnError(c, err)
 		return
 	}
@@ -83,14 +83,14 @@ func (uc *UserController) Delete(c *gin.Context) {
 }
 
 // 更新用户信息接口
-func (uc *UserController) Update(c *gin.Context) {
+func (controller *UserController) Update(c *gin.Context) {
 	var updateRequest dto.UpdateRequest
 	if err := c.ShouldBind(&updateRequest); err != nil {
 		fmt.Println(err)
 		utils.ReturnBindError(c, err)
 		return
 	}
-	if err := uc.userService.Update(c, updateRequest); err != nil {
+	if err := controller.userService.Update(c, updateRequest); err != nil {
 		utils.ReturnError(c, err)
 		return
 	}

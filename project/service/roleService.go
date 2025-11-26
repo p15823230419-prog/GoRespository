@@ -18,17 +18,26 @@ func NewRoleService() *RoleService {
 	}
 }
 
-func (rs RoleService) Create(c *gin.Context, req *dto.CreateRoleRequest) error {
-	role, err := rs.roleDao.FindByRoleName(c.Request.Context(), req.RoleName)
+func (service *RoleService) Create(c *gin.Context, req *dto.CreateRoleRequest) error {
+	role, err := service.roleDao.FindByName(c.Request.Context(), req.RoleName)
 	if err != nil {
 		return err
 	}
 	if role != nil {
 		return errors.New("角色已存在")
 	}
-	err = rs.roleDao.CreateRole(c.Request.Context(), *CreateRoleRequestToEntity(req))
+	err = service.roleDao.Create(c.Request.Context(), *CreateRoleRequestToEntity(req))
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (service *RoleService) List(c *gin.Context) (interface{}, error) {
+	data, err := service.roleDao.FindAll(c.Request.Context())
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }

@@ -60,6 +60,7 @@ func (ms *MenuService) List(c *gin.Context) (interface{}, error) {
 	return tree, nil
 }
 
+// 递归遍历数组添加
 func BuildMenuTree(list []model.Menu, parentID uint64) []model.Menu {
 	var tree []model.Menu
 	for _, menu := range list {
