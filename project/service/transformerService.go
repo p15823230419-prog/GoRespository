@@ -25,7 +25,7 @@ func CreateRoleRequestToEntity(request *dto.CreateRoleRequest) *model.Role {
 	}
 }
 
-// 实体转换为返回体
+// 实体转换为查询返回体
 func EntityToSelectResponse(user entity.User) *dto.SelectResponse {
 	resRoles := make([]string, len(user.Roles))
 	for i, role := range user.Roles {
@@ -49,4 +49,17 @@ func EntityToSelectResponses(users []*entity.User) []*dto.SelectResponse {
 		res[i] = EntityToSelectResponse(*user)
 	}
 	return res
+}
+
+// 更新请求体转实体
+func UpdateRequestToEntity(request dto.UpdateRequest) *entity.User {
+	return &entity.User{
+		Id:       request.Id,
+		Username: request.Username,
+		Nickname: request.Nickname,
+		Password: request.Password,
+		Avatar:   request.Avatar,
+		Phone:    request.Phone,
+		Email:    request.Email,
+	}
 }

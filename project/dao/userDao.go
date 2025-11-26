@@ -1,14 +1,12 @@
 package dao
 
 import (
-	"abc/dto"
 	"abc/entity"
 	"abc/model"
 	"context"
 	"errors"
 	"log"
 
-	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -80,29 +78,36 @@ func (u *UserDao) FindUsers(ctx context.Context, username string, pageNum int, p
 }
 
 // 删除用户
-func (u *UserDao) DeleteUser(ctx *gin.Context) error {
-	if err := db.WithContext(ctx).Delete(&model.User{}).Error; err != nil {
+func (u *UserDao) Delete(ctx context.Context, id uint64) error {
+	if err := db.WithContext(ctx).Delete(&model.User{}, "id", id).Error; err != nil {
+		log.Println(err)
 		return err
 	}
 	return nil
 }
 
-// 更改部分用户信息patch
-func (u *UserDao) Update(ctx context.Context, user dto.UpdateRequest) error {
-	if err := db.WithContext(ctx).
-		Where("id = ?", user.Id).
-		Updates(user).Error; err != nil {
-		return err
-	}
-	return nil
-}
+// 更改用户信息
+func (u *UserDao) Update(ctx context.Context, user entity.User, roleIds []uint64) error {
+	return db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 
-// 全量更新put
-func (u *UserDao) Updates(ctx context.Context, user dto.UpdateRequest) error {
-	if err := db.WithContext(ctx).
-		Where("id = ?", user.Id).
-		Save(user).Error; err != nil {
-		return err
-	}
-	return nil
+		var roles []model.Role
+		if len(roleIds) > 0 {
+			if err := tx.Where("id IN ?", roleIds).Find(&roles).Error; err != nil {
+				return err
+			}
+		}
+		modelUser := userEntityToModel(user)
+
+		// 1. 更新基础信息
+		if err := tx.Updates(&modelUser).Error; err != nil {
+			return err
+		}
+
+		// 2. 更新角色
+		if err := tx.Model(&modelUser).Association("Roles").Replace(roles); err != nil {
+			return err
+		}
+
+		return nil
+	})
 }

@@ -12,10 +12,13 @@ import (
 
 var userController *controller.UserController
 var roleController *controller.RoleController
+var menuController *controller.MenuController
 
 func WebInit() {
 	//初始化
 	userController = controller.NewUserController()
+	roleController = controller.NewRoleController()
+	menuController = controller.NewMenuController()
 	r := gin.Default()
 	// 用户登录
 	r.POST("/user/login", userController.Login)
@@ -29,12 +32,17 @@ func WebInit() {
 	userGroup.GET("/logout", userController.Logout)
 	// 删除用户
 	userGroup.DELETE(":id", userController.Delete)
-	// 添加角色
-	roleController := controller.NewRoleController()
+	// 更新用户
+	userGroup.PUT("", userController.Update)
 	// 创建角色组
-	roleGroup := r.Group("/role", middleware.JWTAuth())
+	roleGroup := r.Group("/role")
 	// 添加角色
-	roleGroup.POST("/add", roleController.CreateRole)
+	roleGroup.POST("/add", roleController.Create)
+	// 创建菜单组
+	menuGroup := r.Group("/menu")
+	menuGroup.POST("/add", menuController.Create)
+	menuGroup.DELETE(":id", menuController.Delete)
+	menuGroup.GET("list", menuController.List)
 	//监听8080端口
 	err := r.Run(":8080")
 	if err != nil {

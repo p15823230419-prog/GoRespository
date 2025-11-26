@@ -1,11 +1,12 @@
 package dao
 
 import (
+	"abc/dto"
 	"abc/entity"
 	"abc/model"
 )
 
-// 模型转换
+// 用户数据转实体
 func userModelToEntity(m model.User) *entity.User {
 	return &entity.User{
 		Id:        m.Id,
@@ -20,6 +21,7 @@ func userModelToEntity(m model.User) *entity.User {
 	}
 }
 
+// 用户数据转实体
 func userModelsToEntities(models []model.User) []*entity.User {
 	res := make([]*entity.User, len(models))
 	for i, m := range models {
@@ -28,6 +30,7 @@ func userModelsToEntities(models []model.User) []*entity.User {
 	return res
 }
 
+// 用户实体转数据
 func userEntityToModel(e entity.User) *model.User {
 	roles := make([]model.Role, 0, len(e.Roles))
 	for _, r := range e.Roles {
@@ -46,5 +49,12 @@ func userEntityToModel(e entity.User) *model.User {
 		Status:    e.Status,
 		CreatedAt: e.CreatedAt,
 		Roles:     e.Roles,
+	}
+}
+
+func creatMenuReqToModel(r *dto.CreateMenuReq) *model.Menu {
+	return &model.Menu{
+		Name:     r.Name,
+		ParentId: r.ParentId,
 	}
 }

@@ -33,3 +33,10 @@ func (rd RoleDao) CreateRole(ctx context.Context, req model.Role) error {
 	}
 	return nil
 }
+
+func (rd RoleDao) UpdateRole(ctx context.Context, req model.Role) error {
+	if err := db.WithContext(ctx).Model(model.Role{}).Save(&req).Error; err != nil {
+		return err
+	}
+	return nil
+}

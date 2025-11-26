@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -33,6 +34,10 @@ func InitValidator() {
 
 // 翻译错误
 func PareJSONError(e error) string {
+	var typeErr *json.UnmarshalTypeError
+	if errors.As(e, &typeErr) {
+		return fmt.Sprintf("字段 %s 类型错误", typeErr.Field)
+	}
 	var translated []string
 	var errs validator.ValidationErrors
 	if errors.As(e, &errs) {

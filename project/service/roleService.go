@@ -18,7 +18,7 @@ func NewRoleService() *RoleService {
 	}
 }
 
-func (rs RoleService) CreateRole(c *gin.Context, req *dto.CreateRoleRequest) error {
+func (rs RoleService) Create(c *gin.Context, req *dto.CreateRoleRequest) error {
 	role, err := rs.roleDao.FindByRoleName(c.Request.Context(), req.RoleName)
 	if err != nil {
 		return err

@@ -23,7 +23,7 @@ func InitDB() {
 	}
 	log.Printf("连接成功")
 	db = gormDb
-	err = db.AutoMigrate(&model.User{}, &model.Role{})
+	err = db.AutoMigrate(&model.User{}, &model.Role{}, &model.Menu{})
 	if err != nil {
 		log.Fatal(err)
 		return

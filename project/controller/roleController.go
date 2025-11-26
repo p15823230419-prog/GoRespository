@@ -19,13 +19,13 @@ func NewRoleController() *RoleController {
 }
 
 // 添加角色接口
-func (rc *RoleController) CreateRole(c *gin.Context) {
+func (rc *RoleController) Create(c *gin.Context) {
 	var req *dto.CreateRoleRequest
 	if err := c.ShouldBind(&req); err != nil {
 		utils.ReturnBindError(c, err)
 		return
 	}
-	err := rc.roleService.CreateRole(c, req)
+	err := rc.roleService.Create(c, req)
 	if err != nil {
 		utils.ReturnError(c, err)
 		return

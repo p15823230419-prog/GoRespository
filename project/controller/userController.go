@@ -4,6 +4,7 @@ import (
 	"abc/dto"
 	"abc/service"
 	"abc/utils"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -55,7 +56,11 @@ func (uc *UserController) Logout(c *gin.Context) {
 
 // 查询接口
 func (uc *UserController) List(c *gin.Context) {
-	data, err := uc.userService.List(c)
+	var selectRequest dto.SelectRequest
+	if err := c.ShouldBind(&selectRequest); err != nil {
+		utils.ReturnBindError(c, err)
+	}
+	data, err := uc.userService.List(c, selectRequest)
 	if err != nil {
 		utils.ReturnError(c, err)
 		return
@@ -72,6 +77,7 @@ func (uc *UserController) List(c *gin.Context) {
 func (uc *UserController) Delete(c *gin.Context) {
 	if err := uc.userService.Delete(c); err != nil {
 		utils.ReturnError(c, err)
+		return
 	}
 	utils.ReturnSuccess(c, "删除成功")
 }
@@ -80,10 +86,13 @@ func (uc *UserController) Delete(c *gin.Context) {
 func (uc *UserController) Update(c *gin.Context) {
 	var updateRequest dto.UpdateRequest
 	if err := c.ShouldBind(&updateRequest); err != nil {
+		fmt.Println(err)
 		utils.ReturnBindError(c, err)
+		return
 	}
-	if err := uc.userService.Uptate(c, updateRequest); err != nil {
-
+	if err := uc.userService.Update(c, updateRequest); err != nil {
+		utils.ReturnError(c, err)
+		return
 	}
 	utils.ReturnSuccess(c, "更新成功")
 }
